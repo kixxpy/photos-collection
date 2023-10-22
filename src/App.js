@@ -13,10 +13,13 @@ const cats = [
 function App() {
 	const [collectons, setCollections] = React.useState([]);
 	const [categoryId, setCategoryId] = React.useState(0);
+	const [page, setPage] = React.useState(1);
 	const [searchValue, setSearchValue] = React.useState('');
 
 	React.useEffect(() => {
-		fetch('https://65353325c620ba9358ec41b6.mockapi.io/photos')
+		const category = categoryId ? `category=${categoryId}` : '';
+
+		fetch(`https://65353325c620ba9358ec41b6.mockapi.io/photos?page=${page}&limit=4&${category}`)
 			.then((res) => res.json())
 			.then((json) => {
 				setCollections(json);
@@ -26,14 +29,19 @@ function App() {
 				alert('Произошла ошибка запроса');
 			})
 			.finally();
-	}, []);
+	}, [categoryId, page]);
 	return (
 		<div className="App">
 			<h1>Моя коллекция фотографий</h1>
 			<div className="top">
 				<ul className="tags">
 					{cats.map((obj, i) => (
-						<li onClick={() => setCategoryId(i)} className={categoryId === i ? 'active' : ''} key={obj.name}>{obj.name}</li>
+						<li
+							onClick={() => setCategoryId(i)}
+							className={categoryId === i ? 'active' : ''}
+							key={obj.name}>
+							{obj.name}
+						</li>
 					))}
 				</ul>
 				<input
@@ -53,9 +61,11 @@ function App() {
 					))}
 			</div>
 			<ul className="pagination">
-				<li>1</li>
-				<li className="active">2</li>
-				<li>3</li>
+				{[...Array(3)].map((_, i) => (
+					<li onClick={() => setPage(i + 1)} className={page === i + 1 ? 'active' : ''} key={i}>
+						{i + 1}
+					</li>
+				))}
 			</ul>
 		</div>
 	);
